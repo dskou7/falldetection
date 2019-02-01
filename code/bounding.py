@@ -1,19 +1,11 @@
 import cv2
+import os
 import numpy as np
 
-
-
-# while(1):
-
-#     cv2.imshow('fgmask', frame)
-#     cv2.imshow('frame', fgmask)
-
-#     k = cv2.waitKey(30) & 0xff
-#     if k == 27:
-#         break
-
-fgbg = cv2.createBackgroundSubtractorMOG()
-reel = cv2.VideoCapture("data/fall1.mp4")
+fgbg = cv2.createBackgroundSubtractorMOG2()
+path = os.path.abspath(os.path.dirname(__file__))
+path = os.path.join(path, "../data/fall1.mp4")
+reel = cv2.VideoCapture(path)
 while(1):
   _, frame = reel.read()
   if(type(frame) == type(None)):

@@ -22,7 +22,5 @@ while(1):
   cv2.imshow('result', frame)
   cv2.waitKey(0)
 
-# I love to code hahahaha
-
 reel.release()
 cv2.destroyAllWindows()

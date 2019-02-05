@@ -14,8 +14,8 @@ n_frames = length = int(reel.get(cv2.CAP_PROP_FRAME_COUNT))
 rect_ratios = np.zeros(n_frames)
 
 ## While loop for processing each frame until no more frames in video
-curr_frame = 0
-while(curr_frame < n_frames):
+curr_frame_i = 0
+while(curr_frame_i < n_frames):
   _, frame = reel.read()
   # extract the foreground using the background subtractor.
   fgmask = fgbg.apply(frame) 
@@ -31,13 +31,13 @@ while(curr_frame < n_frames):
   ## Currently, I'm just taking the largest contour and assuming that's the person. Could be better
   contours = sorted(contours, key=cv2.contourArea, reverse=True)
   x, y, w, h = cv2.boundingRect(contours[0])
-  rect_ratios[curr_frame] = w / h
   cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
+  rect_ratios[curr_frame_i] = w / h
   ## Show the current frame, with any additional things we've drawn superimposed onto the image
   cv2.imshow('result', frame)
-  if(curr_frame > 13):
+  if(curr_frame_i > 13):
     cv2.waitKey(0) # This just pauses until you press a key. I'm not sure which keys work, but i know 'n' does
-  curr_frame += 1
+  curr_frame_i += 1
 
 reel.release()
 cv2.destroyAllWindows()

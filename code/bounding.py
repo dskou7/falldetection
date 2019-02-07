@@ -19,7 +19,7 @@ curr_frame_i = 0
 while(curr_frame_i < n_frames):
   _, frame = reel.read()
   # extract the foreground using the background subtractor.
-  fgmask = fgbg.apply(frame) 
+  fgmask = fgbg.apply(frame)
 
   # TODO - Insert Kalman filter (feed fgmask into it). Use it's output for next thing
   # TODO - Insert optical flow and possibly occlusion detection

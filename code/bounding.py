@@ -40,13 +40,11 @@ while(curr_frame_i < n_frames):
     ellipse_angles[curr_frame_i] = ellipse[2]
   rect_ratios[curr_frame_i] = w / h
   print('curr_frame_i:', curr_frame_i)
-  print('rect_ratio: {0} | ellipse_angle: {1}'.format(
-      rect_ratios[curr_frame_i], ellipse_angles[curr_frame_i]))
+  print('rect_ratio: {0} | ellipse_angle: {1}'.format(rect_ratios[curr_frame_i], ellipse_angles[curr_frame_i]))
   ## Show the current frame, with any additional things we've drawn superimposed onto the image
   cv2.imshow('result', frame)
   # if(curr_frame_i > 10):
-  # This just pauses until you press a key. I'm not sure which keys work, but i know 'n' does
-  cv2.waitKey(0)
+  cv2.waitKey(0) # This just pauses until you press a key. I'm not sure which keys work, but i know 'n' does
   curr_frame_i += 1
 
 reel.release()

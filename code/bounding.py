@@ -12,7 +12,7 @@ def normalize(v):
 
 ## Get video from data and store in a cv2 videoCapture object
 path = os.path.abspath(os.path.dirname(__file__))
-path = os.path.join(path, "../data/fall1.mp4")
+path = os.path.join(path, "../data/falls/fall1.mp4")
 reel = cv2.VideoCapture(path)
 ## Make background subtractor
 fgbg = cv2.createBackgroundSubtractorMOG2()

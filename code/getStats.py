@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 ############## Function declarations ##############
-def processVideo(path):
-  reel = cv2.VideoCapture(path)
+def processVideo(full_path):
+  reel = cv2.VideoCapture(full_path)
   ## Make background subtractor
   fgbg = cv2.createBackgroundSubtractorMOG2()
   ## Initialize variables
@@ -101,11 +101,18 @@ def getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, video_name):
   df = pd.DataFrame(data, columns=['Video', 'Label', 'Delta h', 'Delta w', 'Delta ratio', 'Delta angle'])
   return df
 
-
-######## This is for one video. Build a harness around this to do for all fall videos, then all non-fall
-path = os.path.abspath(os.path.dirname(__file__))
-path = os.path.join(path, "../data/fall1.mp4")
-n_frames, rect_h, rect_w, ellipse_angles = processVideo(path)
-video_name = path.rsplit('/', 1)[-1]
-df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, video_name)
+## Fall videos
+dir_path = os.path.abspath(os.path.dirname(__file__))
+dir_path = os.path.join(dir_path, "../data/falls/")
+directory = os.fsencode(dir_path)
+df = None
+for file in os.listdir(directory):
+  filename = os.fsdecode(file)
+  n_frames, rect_h, rect_w, ellipse_angles = processVideo(os.path.join(dir_path, filename))
+  current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, filename)
+  df = current_df if df is None else df.append(current_df, ignore_index=True)
 print(df)
+# TODO - df.to_csv('path_of_csv.csv')
+
+## TODO - nonfall videos
+

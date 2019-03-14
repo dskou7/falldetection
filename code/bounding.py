@@ -18,7 +18,8 @@ reel = cv2.VideoCapture(path)
 fgbg = cv2.createBackgroundSubtractorMOG2()
 ## Initialize variables
 n_frames = length = int(reel.get(cv2.CAP_PROP_FRAME_COUNT))
-rect_ratios = np.zeros(n_frames)
+rect_w = np.zeros(n_frames)
+rect_h = np.zeros(n_frames)
 ellipse_angles = np.zeros(n_frames)
 
 ## While loop for processing each frame until no more frames in video
@@ -45,9 +46,10 @@ while(curr_frame_i < n_frames):
     ellipse = cv2.fitEllipse(contours[0])
     cv2.ellipse(frame, ellipse, (0, 0, 255), 2)
     ellipse_angles[curr_frame_i] = ellipse[2]
-  rect_ratios[curr_frame_i] = w / h
+  rect_w[curr_frame_i] = w
+  rect_h[curr_frame_i] = h
   print('curr_frame_i:', curr_frame_i)
-  # print('rect_ratio: {0} | ellipse_angle: {1} '.format(rect_ratios[curr_frame_i], ellipse_angles[curr_frame_i]))
+  # print('ellipse_angle: {0} '.format(ellipse_angles[curr_frame_i]))
   ## Show the current frame, with any additional things we've drawn superimposed onto the image
   cv2.imshow('result', frame)
   if(curr_frame_i > 10):
@@ -59,13 +61,19 @@ cv2.destroyAllWindows()
 
 # TODO - Fill missing values (0s) for ellipse angles. Just use a linear interpolation
 
-#### Analyze some data
-## Rectangle ratio
-plt.scatter(range(n_frames), rect_ratios)
-plt.title('Rectangle Ratio Over Time')
-plt.xlabel('Video Frame')
-plt.ylabel('Rectangle Ratio')
-plt.show()
+
+### Analyze some data ###
+
+# Title will just be y_label concatenated with ' Over Time'
+def plotVariableVsFrame(variable, n_frames, y_label):
+  plt.scatter(range(n_frames), variable)
+  plt.title(y_label + ' Over Time')
+  plt.xlabel('Video Frame')
+  plt.ylabel(y_label)
+  plt.show()
+
+rect_ratios = rect_w / rect_h
+plotVariableVsFrame(rect_ratios, n_frames, 'Rectangle Ratio')
 '''
 Observations: Looks like rectangle ratio is indeed a good variable for this. 
 --- fall1.mp4 ---
@@ -78,12 +86,7 @@ When the subject first enters the scene, we pick up her hand and foot as the ent
 A bit of noise, but not as noisy as the ellipse. Kalman filter should help
 '''
 
-## Ellipse angle
-plt.scatter(range(n_frames), ellipse_angles)
-plt.title('Ellipse Angle Over Time')
-plt.xlabel('Video Frame')
-plt.ylabel('Ellipse Angle w/ Y-axis')
-plt.show()
+plotVariableVsFrame(ellipse_angles, n_frames, 'Ellipse Angle w/ Y-Axis')
 '''
 Observations: Of course, the angle of the ellipse represents if the person is lying down or not. Values close to 90 
 represent lying down (perpendicular to y-axis). The derivative (the third variable we need) is critical to be able 
@@ -94,20 +97,10 @@ Similar observation to the rectangle ratio for this video.
 This was super noisy for some reason! This is a good video to test the effect of the kalman filter, because it should help a lot with this noise
 '''
 
-## Ratio derivative
 ratio_derivative = np.abs(np.diff(rect_ratios))
-plt.scatter(range(n_frames-1), ratio_derivative) # Note we are excluding the initial frame b/c there's no derivative value for t=0
-plt.title('Ratio Derivative Over Time')
-plt.xlabel('Video Frame (exclude frame 1)')
-plt.ylabel('Ratio Derivative')
-plt.show()
-## Angle derivative
+plotVariableVsFrame(ratio_derivative, n_frames, 'Ratio Derivative')
 angle_derivative = np.abs(np.diff(ellipse_angles))
-plt.scatter(range(n_frames-1), angle_derivative) # Note we are excluding the initial frame b/c there's no derivative value for t=0
-plt.title('Angle Derivative Over Time')
-plt.xlabel('Video Frame (exclude frame 1)')
-plt.ylabel('Angle Derivative')
-plt.show()
+plotVariableVsFrame(angle_derivative, n_frames, 'Angle Derivative')
 '''
 Observations:
 Both these derivatives suck! Totally uninformative. 

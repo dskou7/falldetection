@@ -2,14 +2,15 @@ import cv2
 import os
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
 ######## This is for one video. Build a harness around this to do for all fall videos, then all non-fall
 
 ## Get video from data and store in a cv2 videoCapture object
 path = os.path.abspath(os.path.dirname(__file__))
-path = os.path.join(path, "../data/fall1.mp4")
-print('---- Video Path: {0} ----'.format(path))
+relative_path = "../data/fall1.mp4"
+path = os.path.join(path, relative_path)
 
 reel = cv2.VideoCapture(path)
 ## Make background subtractor
@@ -69,10 +70,10 @@ def calcBiggestChange(nparray, outlierConstant=1.5):
   clean_a = removeOutliers(nparray, outlierConstant)
   min_i = np.argmin(clean_a)
   max_i = np.argmax(clean_a)
-  print('min i: {0} | max i: {1}'.format(min_i, max_i))
-  print('max: {1} | min: {0}'.format(clean_a[min_i], clean_a[max_i]))
+  # print('min i: {0} | max i: {1}'.format(min_i, max_i))
+  # print('max: {1} | min: {0}'.format(clean_a[min_i], clean_a[max_i]))
   direction = 1 if min_i < max_i else -1
-  print('direction: ', direction)
+  # print('direction: ', direction)
   delta = direction * (clean_a[max_i] - clean_a[min_i])
   return delta
 
@@ -82,7 +83,9 @@ rect_ratios = rect_w / rect_h
 delta_ratio = calcBiggestChange(rect_ratios)
 delta_angle = calcBiggestChange(ellipse_angles) # may want to reduce the outlier constant for angle. outlierConstant=.75 worked well on this one clip.
 
-print('delta h: {0} | delta w: {1} \n delta ratio: {2} | delta angle: {3}'.format(delta_h, delta_w, delta_ratio, delta_angle))
+data = {'Video': [relative_path], 'Label': [1], 'Delta h': [delta_h], 'Delta w': [delta_w], 'Delta ratio': [delta_ratio], 'Delta angle': [delta_angle] }
+df = pd.DataFrame(data, columns=['Video', 'Label', 'Delta h', 'Delta w', 'Delta ratio', 'Delta angle'])
+print(df)
 
 # Title will just be y_label concatenated with ' Over Time'
 def plotVariableVsFrame(variable, n_frames, y_label):
@@ -94,15 +97,15 @@ def plotVariableVsFrame(variable, n_frames, y_label):
 
 
 ## Make sure outlier removal is working as intended
-plotVariableVsFrame(rect_h, n_frames, 'Rectangle Height')
-clean_h = removeOutliers(rect_h)
-plotVariableVsFrame(clean_h, len(clean_h), 'Cleansed height')
-plotVariableVsFrame(rect_w, n_frames, 'Rectangle Width')
-clean_w = removeOutliers(rect_w)
-plotVariableVsFrame(clean_w, len(clean_w), 'Cleansed width')
-plotVariableVsFrame(rect_ratios, n_frames, 'Rectangle Ratio')
-clean_ratio = removeOutliers(rect_ratios)
-plotVariableVsFrame(clean_ratio, len(clean_ratio), 'Cleansed ratio')
-plotVariableVsFrame(ellipse_angles, n_frames, 'Ellipse Angle')
-clean_angle = removeOutliers(ellipse_angles) 
-plotVariableVsFrame(clean_angle, len(clean_angle), 'Cleansed angle')
+# plotVariableVsFrame(rect_h, n_frames, 'Rectangle Height')
+# clean_h = removeOutliers(rect_h)
+# plotVariableVsFrame(clean_h, len(clean_h), 'Cleansed height')
+# plotVariableVsFrame(rect_w, n_frames, 'Rectangle Width')
+# clean_w = removeOutliers(rect_w)
+# plotVariableVsFrame(clean_w, len(clean_w), 'Cleansed width')
+# plotVariableVsFrame(rect_ratios, n_frames, 'Rectangle Ratio')
+# clean_ratio = removeOutliers(rect_ratios)
+# plotVariableVsFrame(clean_ratio, len(clean_ratio), 'Cleansed ratio')
+# plotVariableVsFrame(ellipse_angles, n_frames, 'Ellipse Angle')
+# clean_angle = removeOutliers(ellipse_angles) 
+# plotVariableVsFrame(clean_angle, len(clean_angle), 'Cleansed angle')

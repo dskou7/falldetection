@@ -3,9 +3,16 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Normalizes the vector v
+def normalize(v):
+    norm = np.linalg.norm(v)
+    if norm == 0:
+       return v
+    return v / norm
+
 ## Get video from data and store in a cv2 videoCapture object
 path = os.path.abspath(os.path.dirname(__file__))
-path = os.path.join(path, "../data/fall5.mp4")
+path = os.path.join(path, "../data/fall1.mp4")
 reel = cv2.VideoCapture(path)
 ## Make background subtractor
 fgbg = cv2.createBackgroundSubtractorMOG2()
@@ -40,16 +47,15 @@ while(curr_frame_i < n_frames):
     ellipse_angles[curr_frame_i] = ellipse[2]
   rect_ratios[curr_frame_i] = w / h
   print('curr_frame_i:', curr_frame_i)
-  print('rect_ratio: {0} | ellipse_angle: {1}'.format(rect_ratios[curr_frame_i], ellipse_angles[curr_frame_i]))
+  # print('rect_ratio: {0} | ellipse_angle: {1} '.format(rect_ratios[curr_frame_i], ellipse_angles[curr_frame_i]))
   ## Show the current frame, with any additional things we've drawn superimposed onto the image
   cv2.imshow('result', frame)
-  # if(curr_frame_i > 10):
-  cv2.waitKey(0) # This just pauses until you press a key. I'm not sure which keys work, but i know 'n' does
+  if(curr_frame_i > 10):
+    cv2.waitKey(0) # This just pauses until you press a key. I'm not sure which keys work, but i know 'n' does
   curr_frame_i += 1
 
 reel.release()
 cv2.destroyAllWindows()
-
 
 # TODO - Fill missing values (0s) for ellipse angles. Just use a linear interpolation
 
@@ -71,6 +77,7 @@ When the subject first enters the scene, we pick up her hand and foot as the ent
 --- fall5.mp4 ---
 A bit of noise, but not as noisy as the ellipse. Kalman filter should help
 '''
+
 ## Ellipse angle
 plt.scatter(range(n_frames), ellipse_angles)
 plt.title('Ellipse Angle Over Time')
@@ -85,4 +92,23 @@ to detect a rapid change from standing to lying down
 Similar observation to the rectangle ratio for this video.
 --- fall5.mp4 ---
 This was super noisy for some reason! This is a good video to test the effect of the kalman filter, because it should help a lot with this noise
+'''
+
+## Ratio derivative
+ratio_derivative = np.abs(np.diff(rect_ratios))
+plt.scatter(range(n_frames-1), ratio_derivative) # Note we are excluding the initial frame b/c there's no derivative value for t=0
+plt.title('Ratio Derivative Over Time')
+plt.xlabel('Video Frame (exclude frame 1)')
+plt.ylabel('Ratio Derivative')
+plt.show()
+## Angle derivative
+angle_derivative = np.abs(np.diff(ellipse_angles))
+plt.scatter(range(n_frames-1), angle_derivative) # Note we are excluding the initial frame b/c there's no derivative value for t=0
+plt.title('Angle Derivative Over Time')
+plt.xlabel('Video Frame (exclude frame 1)')
+plt.ylabel('Angle Derivative')
+plt.show()
+'''
+Observations:
+Both these derivatives suck! Totally uninformative. 
 '''

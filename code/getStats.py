@@ -103,7 +103,7 @@ def getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, video_name):
 
 ## Fall videos
 dir_path = os.path.abspath(os.path.dirname(__file__))
-dir_path = os.path.join(dir_path, "../data/falls/")
+dir_path = os.path.join(dir_path, "../data/fall/")
 directory = os.fsencode(dir_path)
 df = None
 for file in os.listdir(directory):

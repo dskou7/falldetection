@@ -12,7 +12,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 ### Step 1: Loads data set from our csv file into a pandas df
-
+pwd = os.path.abspath(os.path.dirname(__file__))
+data_path = os.path.join(pwd, "../data/labled_dataset.csv")
+data = pd.read_csv(data_path)
 
 ### Step 2: Partitions into training and test sets
 

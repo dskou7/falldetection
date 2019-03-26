@@ -42,7 +42,7 @@ def processVideo(full_path):
   cv2.destroyAllWindows()
   return n_frames, rect_h, rect_w, ellipse_angles
 
-def getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, video_name):
+def getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, video_name, label):
   def removeOutliers(nparray, outlierConstant=1.5):
       upper_quartile = np.percentile(nparray, 75)
       lower_quartile = np.percentile(nparray, 25)
@@ -97,22 +97,32 @@ def getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, video_name):
   # clean_angle = removeOutliers(ellipse_angles) 
   # plotVariableVsFrame(clean_angle, len(clean_angle), 'Cleansed angle')
 
-  data = {'Video': [video_name], 'Label': [1], 'Delta h': [delta_h], 'Delta w': [delta_w], 'Delta ratio': [delta_ratio], 'Delta angle': [delta_angle] }
+  data = {'Video': [video_name], 'Label': [label], 'Delta h': [delta_h], 'Delta w': [delta_w], 'Delta ratio': [delta_ratio], 'Delta angle': [delta_angle] }
   df = pd.DataFrame(data, columns=['Video', 'Label', 'Delta h', 'Delta w', 'Delta ratio', 'Delta angle'])
   return df
 
-## Fall videos
-dir_path = os.path.abspath(os.path.dirname(__file__))
-dir_path = os.path.join(dir_path, "../data/falls/")
-directory = os.fsencode(dir_path)
-df = None
-for file in os.listdir(directory):
-  filename = os.fsdecode(file)
-  n_frames, rect_h, rect_w, ellipse_angles = processVideo(os.path.join(dir_path, filename))
-  current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, filename)
-  df = current_df if df is None else df.append(current_df, ignore_index=True)
-print(df)
-# TODO - df.to_csv('path_of_csv.csv')
 
-## TODO - nonfall videos
+
+'''
+Loops through the fall or nonfall directory of data videos and generates a data frame representing the feature set for the videos
+@param fall: boolean 
+'''
+def processVideosForClass(dir_path, fall, df=None):
+  subpath = "../data/fall/" if fall else "../data/nonfall/"
+  dir_path = os.path.join(dir_path, subpath)
+  directory = os.fsencode(dir_path)
+  for file in os.listdir(directory):
+    filename = os.fsdecode(file)
+    n_frames, rect_h, rect_w, ellipse_angles = processVideo(os.path.join(dir_path, filename))
+    current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angles, filename, 1 if fall else 0)
+    df = current_df if df is None else df.append(current_df, ignore_index=True)
+  return df
+
+
+dir_path = os.path.abspath(os.path.dirname(__file__))
+df = processVideosForClass(dir_path, fall=True)
+df = processVideosForClass(dir_path, fall=False, df=df)
+print(df)
+csv_path = os.path.join(dir_path, "../data/labled_dataset.csv")
+df.to_csv(csv_path)
 

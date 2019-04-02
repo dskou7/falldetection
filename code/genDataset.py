@@ -11,7 +11,7 @@ def processVideo(full_path):
   ## Make background subtractor
   fgbg = cv2.createBackgroundSubtractorMOG2()
   ## Initialize variables
-  n_frames = length = int(reel.get(cv2.CAP_PROP_FRAME_COUNT))
+  n_frames = int(reel.get(cv2.CAP_PROP_FRAME_COUNT))
   rect_w = np.zeros(n_frames)
   rect_h = np.zeros(n_frames)
   ellipse_angle = np.zeros(n_frames)

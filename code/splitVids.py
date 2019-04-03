@@ -13,32 +13,42 @@ FPS = 30.0
 
 def splitVid(parent_reel, out_path, prefix, ext, sub_vid_size=60, stride=30):
   n_frames = int(parent_reel.get(cv2.CAP_PROP_FRAME_COUNT))
-  n_subreels = 1 if n_frames <= sub_vid_size else math.ceil(n_frames / stride)
-  start_frame_last_subreel = sub_vid_size - (n_frames % sub_vid_size) if n_subreels > 1 else 0
+  n_subreels = 1
+  if (n_frames > sub_vid_size):
+    n_subreels = int(n_frames / stride) - 1 if(n_frames % stride == 0) else int(n_frames/stride)
+  start_frame_last_subreel = n_frames - sub_vid_size if n_subreels > 1 else 0
+  print('n_frames: {0} | n_subreels: {1} | start frame last subreel: {2}'.format(n_frames, n_subreels, start_frame_last_subreel))
   w = int(parent_reel.get(cv2.CAP_PROP_FRAME_WIDTH))
   h = int(parent_reel.get(cv2.CAP_PROP_FRAME_HEIGHT))
-  subreel_i = 0
+  curr_subreel = 1
 
-  while(subreel_i < n_subreels):
-    # _, frame = parent_reel.read()
-    subname = prefix + '-' + str(subreel_i+1) + '.' + ext
+  while(curr_subreel <= n_subreels):
+    subname = prefix + '-' + str(curr_subreel) + '.' + ext
     sub_full_path = os.path.join(out_path, subname)
+    print('curr subreel: {0} | name of curr subreel: {1}'.format(curr_subreel, subname))
     out = cv2.VideoWriter(sub_full_path, FOUR_CC, FPS, (w,h))
-    # If we're on the last subreel, make sure starting frame is sub_vid_size before end of frame. (will have overlap)
-    if(subreel_i == n_subreels):
-      parent_reel.set(cv2.CAP_PROP_POS_FRAMES, start_frame_last_subreel)
-    else:
-      parent_reel.set(cv2.CAP_PROP_POS_FRAMES, stride * subreel_i)
     
-    frame_cnt = 0
-    while(frame_cnt < sub_vid_size and frame_cnt < n_frames):
+    curr_frame_cnt = 1
+    while(curr_frame_cnt <= sub_vid_size and curr_frame_cnt <= n_frames):
+      print('curr frame cnt', curr_frame_cnt)
       _, frame = parent_reel.read()
       out.write(frame)
-      frame_cnt += 1
+      curr_frame_cnt += 1
+
+    ### Update starting frame for next subreel  
+    # If we're on the last subreel, make sure starting frame is sub_vid_size frames before end of video. (will have overlap)
+    curr_subreel += 1
+    if(curr_subreel == n_subreels):
+      print('curr subreel = {0}, n subreels = {1}, setting next frame to {2}'.format(
+          curr_subreel, n_subreels, start_frame_last_subreel))
+      parent_reel.set(cv2.CAP_PROP_POS_FRAMES, start_frame_last_subreel)
+    else:
+      print('setting next frame to {0}'.format(stride * curr_subreel-1))
+      parent_reel.set(cv2.CAP_PROP_POS_FRAMES, stride * curr_subreel-1)
     
     out.release()
-    subreel_i += 1
-  # cv2.destroyAllWindows()
+    print('--------------- End of {0} ----------------'.format(subname))
+  print('------------------------------- End of {0} ------------------------------'.format(prefix))
 
 def splitVidsInDirectory(src_path, out_path):
   directory = os.fsencode(src_path)
@@ -48,6 +58,7 @@ def splitVidsInDirectory(src_path, out_path):
     reel = cv2.VideoCapture(file_path)
     prefix, ext = filename.split('.')  # Assumes only one '.' in filename
     splitVid(reel, out_path, prefix, ext)
+    reel.release()
 
 def parseArgs(argv):
   inputdir = ''

@@ -16,28 +16,19 @@ from sklearn.neighbors import KNeighborsClassifier
 
 ### Step 1a: Loads data set from our csv file into a pandas df
 pwd = os.path.abspath(os.path.dirname(__file__))
-data_path = os.path.join(pwd, "../data/labled_dataset.csv")
+data_path = os.path.join(pwd, "../data/labeled_augm_dataset.csv")
 data = pd.read_csv(data_path)
 data = data.drop(columns=['Video'])
 ### Step 1b: Partitions into training and test sets
 # might want to use the "stratify" parameter. look it up. use random_state=1 for reproducibility
-train, test = train_test_split(data, test_size=0.2, random_state=1) 
+train, test = train_test_split(data, test_size=0.2)
 train_labels = train['Label'].values
 train = train.drop(columns=['Label'])
 test_labels = test['Label'].values
 test = test.drop(columns=['Label'])
-# print(train)
-# print(train_labels)
-# print(test)
-# print(test_labels)
 
 
 ### Step 2: "Trains" KNN, and then predicts for test set.
-## OpenCV KNN - threw an error and I didn't feel like dealing with it
-# knn = cv2.KNearest()
-# knn.train(train, train_labels)
-# preds = knn.find_nearest(test, k=3)
-# print(preds)
 knn = KNeighborsClassifier(n_neighbors=3)
 knn.fit(train, train_labels)
 preds = knn.predict(test)
@@ -51,10 +42,10 @@ print('Accuracy:', accuracy)
 
 
 ''' Notes/Analysis
-So right now we get totally different accuracies just depending on how the data is randomly split (between 33%-77%)
+We get slightly different accuracies depending on how the data is randomly split (between 60%-93%, typically high 70s, low 80s)
 We need several things: 
- - a lot more data (this includes breaking down our clips into 60 frame bundles, or smaller)
- - good noise filtering/smoothing techniques
- - maybe removing videos with multiple subjects/occlusions
+ - IN PROGRESS a lot more data (this includes breaking down our clips into 60 frame bundles, or smaller)
+ - IN PROGRESS good noise filtering/smoothing techniques
+ - DONE maybe removing videos with multiple subjects/occlusions
  - inspecting the "calcBiggestChange" f(x) we're using to calculate our stats. There may be a much better way to generate those features
 '''

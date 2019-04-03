@@ -1,9 +1,11 @@
-import cv2
-import os
+import os, cv2, sys, getopt
+from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from scipy.signal import savgol_filter
+from sklearn import preprocessing
+
 
 ############## Function declarations ##############
 def processVideo(full_path):
@@ -121,7 +123,7 @@ def getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angle, video_name, label)
       rect_w), calcBiggestChange(ellipse_angle), calcBiggestChange(rect_ratio)
 
   # Make sure smoothing is working as intended
-  visualizeSmoothing(n_frames, rect_h, rect_w, ellipse_angle, rect_ratio)
+  # visualizeSmoothing(n_frames, rect_h, rect_w, ellipse_angle, rect_ratio)
 
   # Save stats to a df row
   data = {'Video': [video_name], 'Label': [label], 'Delta h': [delta_h], 'Delta w': [delta_w], 'Delta ratio': [delta_ratio], 'Delta angle': [delta_angle] }
@@ -134,28 +136,61 @@ def getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angle, video_name, label)
 Loops through the fall or nonfall directory of data videos and generates a data frame representing the feature set for the videos
 @param fall: boolean 
 '''
-def processVideosForClass(dir_path, fall, df=None):
-  subpath = "../data/fall/" if fall else "../data/nonfall/"
-  dir_path = os.path.join(dir_path, subpath)
+def processVideosForClass(dir_path, label, df=None):
   directory = os.fsencode(dir_path)
   for file in os.listdir(directory):
     filename = os.fsdecode(file)
     n_frames, rect_h, rect_w, ellipse_angle = processVideo(os.path.join(dir_path, filename))
-    current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angle, filename, 1 if fall else 0)
+    current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angle, filename, label)
     df = current_df if df is None else df.append(current_df, ignore_index=True)
   return df
 
-############## Main ##############
-dir_path = os.path.abspath(os.path.dirname(__file__))
-# df = processVideosForClass(dir_path, fall=True)
-# df = processVideosForClass(dir_path, fall=False, df=df)
-# print(df)
-# csv_path = os.path.join(dir_path, "../data/labled_dataset.csv")
-# df.to_csv(csv_path)
+
+def parseArgs(argv):
+  fall_dir = ''
+  nonfall_dir = ''
+  outfile = ''
+  try:
+    opts, args = getopt.getopt(argv, "hf:n:o:", ['fall-dir=', 'nonfall-dir=', 'outfile=']) # short opts w/ ':' after and long opts with '=' after are required
+  except getopt.GetoptError:
+    print('genDataset.py -f <fall-dir> -n <nonfall-dir> -o <outfile>')
+    sys.exit(2)
+  for opt, arg in opts:
+    if(opt == '-h'):
+      print('genDataset.py -f <fall-dir> -n <nonfall-dir> -o <outfile>')
+      sys.exit()
+    elif(opt in ("-f", "--fall-dir")):
+      fall_dir = Path(arg).resolve()
+    elif(opt in ("-n", "--nonfall-dir")):
+      nonfall_dir = Path(arg).resolve()
+    elif(opt in ("-o", "--outfile")):
+      outfile = Path(arg).resolve()
+  if(fall_dir == '' or nonfall_dir == '' or outfile == ''):
+    print('genDataset.py -f <fall-dir> -n <nonfall-dir> -o <outfile>')
+    sys.exit(2)
+  return fall_dir, nonfall_dir, outfile
+
+def main(argv):
+  fall_dir, nonfall_dir, outfile = parseArgs(argv)
+  df = processVideosForClass(fall_dir, 1)
+  df = processVideosForClass(nonfall_dir, 0, df=df)
+  # print(df)
+  ## Normalize continuous columns
+  x = df[['Delta h', 'Delta w', 'Delta ratio', 'Delta angle']].values
+  x_scaled = preprocessing.normalize(x, norm='l1')
+  df[['Delta h', 'Delta w', 'Delta ratio', 'Delta angle']] = pd.DataFrame(x_scaled)
+  print(df)
+  df.to_csv(outfile, index=False)
+
+  ### Uncomment this to test things on just one video and comment the rest of main out. TODO - outdated
+  # dir_path = os.path.abspath(os.path.dirname(__file__))
+  # n_frames, rect_h, rect_w, ellipse_angle = processVideo(os.path.join(dir_path, "../data/fall/fall1.mp4"))
+  # current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angle, "../data/fall/fall1.mp4", 1)
+  # print(current_df)
+
+if (__name__ == "__main__"):
+  main(sys.argv[1:])
 
 
-### Uncomment this to test things on just one video and comment the rest of main out
-dir_path = os.path.abspath(os.path.dirname(__file__))
-n_frames, rect_h, rect_w, ellipse_angle = processVideo(os.path.join(dir_path, "../data/fall/fall1.mp4"))
-current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angle, "../data/fall/fall1.mp4", 1)
-print(current_df)
+
+

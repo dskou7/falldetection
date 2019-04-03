@@ -64,7 +64,7 @@ def parseArgs(argv):
   inputdir = ''
   outputdir = ''
   try:
-    opts, args = getopt.getopt(argv, "hi:o:", ["idir=", "odir="])
+    opts, args = getopt.getopt(argv, "hi:o:", ["indir=", "outdir="])
   except getopt.GetoptError:
     print('splitVids.py -i <inputdir> -o <outputdir>')
     sys.exit(2)

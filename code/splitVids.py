@@ -8,7 +8,7 @@ import os, cv2, sys, getopt, math
 import numpy as np
 from pathlib import Path
 
-FOUR_CC = cv2.VideoWriter_fourcc(*'MP4V')
+FOUR_CC = cv2.VideoWriter_fourcc(*'mp4v')
 FPS = 30.0
 
 def splitVid(parent_reel, out_path, prefix, ext, sub_vid_size=60, stride=30):
@@ -17,7 +17,7 @@ def splitVid(parent_reel, out_path, prefix, ext, sub_vid_size=60, stride=30):
   if (n_frames > sub_vid_size):
     n_subreels = int(n_frames / stride) - 1 if(n_frames % stride == 0) else int(n_frames/stride)
   start_frame_last_subreel = n_frames - sub_vid_size if n_subreels > 1 else 0
-  print('n_frames: {0} | n_subreels: {1} | start frame last subreel: {2}'.format(n_frames, n_subreels, start_frame_last_subreel))
+  # print('n_frames: {0} | n_subreels: {1} | start frame last subreel: {2}'.format(n_frames, n_subreels, start_frame_last_subreel))
   w = int(parent_reel.get(cv2.CAP_PROP_FRAME_WIDTH))
   h = int(parent_reel.get(cv2.CAP_PROP_FRAME_HEIGHT))
   curr_subreel = 1
@@ -25,7 +25,7 @@ def splitVid(parent_reel, out_path, prefix, ext, sub_vid_size=60, stride=30):
   while(curr_subreel <= n_subreels):
     subname = prefix + '-' + str(curr_subreel) + '.' + ext
     sub_full_path = os.path.join(out_path, subname)
-    print('curr subreel: {0} | name of curr subreel: {1}'.format(curr_subreel, subname))
+    # print('curr subreel: {0} | name of curr subreel: {1}'.format(curr_subreel, subname))
     out = cv2.VideoWriter(sub_full_path, FOUR_CC, FPS, (w,h))
     
     curr_frame_cnt = 1
@@ -39,11 +39,11 @@ def splitVid(parent_reel, out_path, prefix, ext, sub_vid_size=60, stride=30):
     # If we're on the last subreel, make sure starting frame is sub_vid_size frames before end of video. (will have overlap)
     curr_subreel += 1
     if(curr_subreel == n_subreels):
-      print('curr subreel = {0}, n subreels = {1}, setting next frame to {2}'.format(
-          curr_subreel, n_subreels, start_frame_last_subreel))
+      # print('curr subreel = {0}, n subreels = {1}, setting next frame to {2}'.format(
+      #     curr_subreel, n_subreels, start_frame_last_subreel))
       parent_reel.set(cv2.CAP_PROP_POS_FRAMES, start_frame_last_subreel)
     else:
-      print('setting next frame to {0}'.format(stride * curr_subreel-1))
+      # print('setting next frame to {0}'.format(stride * curr_subreel-1))
       parent_reel.set(cv2.CAP_PROP_POS_FRAMES, stride * curr_subreel-1)
     
     out.release()

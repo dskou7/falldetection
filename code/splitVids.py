@@ -30,7 +30,7 @@ def splitVid(parent_reel, out_path, prefix, ext, sub_vid_size=60, stride=30):
     
     curr_frame_cnt = 1
     while(curr_frame_cnt <= sub_vid_size and curr_frame_cnt <= n_frames):
-      print('curr frame cnt', curr_frame_cnt)
+      # print('curr frame cnt', curr_frame_cnt)
       _, frame = parent_reel.read()
       out.write(frame)
       curr_frame_cnt += 1

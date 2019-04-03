@@ -21,7 +21,7 @@ data = pd.read_csv(data_path)
 data = data.drop(columns=['Video'])
 ### Step 1b: Partitions into training and test sets
 # might want to use the "stratify" parameter. look it up. use random_state=1 for reproducibility
-train, test = train_test_split(data, test_size=0.2) 
+train, test = train_test_split(data, test_size=0.2, random_state=1) 
 train_labels = train['Label'].values
 train = train.drop(columns=['Label'])
 test_labels = test['Label'].values

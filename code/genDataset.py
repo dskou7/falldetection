@@ -27,6 +27,11 @@ def processVideo(full_path):
     contours, _ = cv2.findContours(
         fgmask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     contours = sorted(contours, key=cv2.contourArea, reverse=True)
+    if(len(contours) == 0):
+      print('No contours found in frame {0}, marking as outlier, continuing to next frame'.format(curr_frame_i))
+      ellipse_angle[curr_frame_i] = rect_w[curr_frame_i] = rect_h[curr_frame_i] = -999999
+      curr_frame_i += 1
+      continue
     x, y, w, h = cv2.boundingRect(contours[0])
     cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
@@ -140,6 +145,10 @@ def processVideosForClass(dir_path, label, df=None):
   directory = os.fsencode(dir_path)
   for file in os.listdir(directory):
     filename = os.fsdecode(file)
+    if(filename[0] == '.'):
+      print('Skipping hidden file {0}'.format(filename))
+      continue
+    print('Processing video {0}'.format(filename))
     n_frames, rect_h, rect_w, ellipse_angle = processVideo(os.path.join(dir_path, filename))
     current_df = getStatsForVideo(n_frames, rect_h, rect_w, ellipse_angle, filename, label)
     df = current_df if df is None else df.append(current_df, ignore_index=True)
@@ -172,8 +181,8 @@ def parseArgs(argv):
 
 def main(argv):
   fall_dir, nonfall_dir, outfile = parseArgs(argv)
-  df = processVideosForClass(fall_dir, 1)
-  df = processVideosForClass(nonfall_dir, 0, df=df)
+  df = processVideosForClass(nonfall_dir, 0)
+  df = processVideosForClass(fall_dir, 1, df=df)
   # print(df)
   ## Normalize continuous columns
   x = df[['Delta h', 'Delta w', 'Delta ratio', 'Delta angle']].values

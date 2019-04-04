@@ -16,7 +16,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 ### Step 1a: Loads data set from our csv file into a pandas df
 pwd = os.path.abspath(os.path.dirname(__file__))
-data_path = os.path.join(pwd, "../data/labeled_augm_dataset.csv")
+data_path = os.path.join(pwd, "../data/round2_dataset.csv")
 data = pd.read_csv(data_path)
 data = data.drop(columns=['Video'])
 ### Step 1b: Partitions into training and test sets

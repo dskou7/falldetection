@@ -63,7 +63,7 @@ def removeOutliers(x, outlierConstant=1.5):
 # moving average: calculate average of given number (window len) of neighbors
 def avg_smooth(x, window_len=13):
   df = pd.DataFrame(x)
-  return df.rolling(window_len).mean()
+  return df.rolling(window_len).mean().values
 
 # Uses the Savitzky-Golay filter (finds least-square fit). Good for signal data
 ####### SEEMS SUPERIOR TO AVG_SMOOTH

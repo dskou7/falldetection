@@ -1,0 +1,59 @@
+CONCLUSIONS:
+n_neighbors makes minimal difference 
+Notice - we want to maximize *recall* b/c we don't want false negatives
+
+-------- Using dataset: ../data/final_dataset_sg.csv --------
+---KNN n_neighbors=2---
+Avg validation accuracy: 0.87 (+/- 0.06)
+Avg validation precision: 0.70 (+/- 0.19)
+Avg validation recall: 0.71 (+/- 0.16)
+Avg validation f1 score: 0.70 (+/- 0.12)
+Avg test accuracy: 0.87
+---KNN n_neighbors=3---
+Avg validation accuracy: 0.88 (+/- 0.06)
+Avg validation precision: 0.71 (+/- 0.19)
+Avg validation recall: 0.72 (+/- 0.18)
+Avg validation f1 score: 0.70 (+/- 0.13)
+Avg test accuracy: 0.87
+---KNN n_neighbors=4---
+Avg validation accuracy: 0.87 (+/- 0.06)
+Avg validation precision: 0.71 (+/- 0.20)
+Avg validation recall: 0.71 (+/- 0.19)
+Avg validation f1 score: 0.70 (+/- 0.13)
+Avg test accuracy: 0.87
+---KNN n_neighbors=5---
+Avg validation accuracy: 0.87 (+/- 0.06)
+Avg validation precision: 0.70 (+/- 0.20)
+Avg validation recall: 0.71 (+/- 0.20)
+Avg validation f1 score: 0.70 (+/- 0.14)
+Avg test accuracy: 0.87
+---KNN n_neighbors=6---
+Avg validation accuracy: 0.87 (+/- 0.07)
+Avg validation precision: 0.70 (+/- 0.20)
+Avg validation recall: 0.71 (+/- 0.20)
+Avg validation f1 score: 0.69 (+/- 0.14)
+Avg test accuracy: 0.88
+---KNN n_neighbors=7---
+Avg validation accuracy: 0.87 (+/- 0.07)
+Avg validation precision: 0.69 (+/- 0.20)
+Avg validation recall: 0.70 (+/- 0.20)
+Avg validation f1 score: 0.69 (+/- 0.15)
+Avg test accuracy: 0.88
+---KNN n_neighbors=8---
+Avg validation accuracy: 0.87 (+/- 0.06)
+Avg validation precision: 0.70 (+/- 0.19)
+Avg validation recall: 0.70 (+/- 0.20)
+Avg validation f1 score: 0.69 (+/- 0.14)
+Avg test accuracy: 0.88
+---KNN n_neighbors=9---
+Avg validation accuracy: 0.87 (+/- 0.06)
+Avg validation precision: 0.69 (+/- 0.19)
+Avg validation recall: 0.70 (+/- 0.21)
+Avg validation f1 score: 0.69 (+/- 0.15)
+Avg test accuracy: 0.88
+---KNN n_neighbors=10---
+Avg validation accuracy: 0.87 (+/- 0.06)
+Avg validation precision: 0.69 (+/- 0.18)
+Avg validation recall: 0.70 (+/- 0.21)
+Avg validation f1 score: 0.69 (+/- 0.15)
+Avg test accuracy: 0.88
